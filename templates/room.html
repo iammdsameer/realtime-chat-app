@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+<!--  -->
+{% block style %}
+<link
+  href="https://fonts.googleapis.com/icon?family=Material+Icons"
+  rel="stylesheet"
+/>
+{% endblock %}
+<!--  -->
+{% block content %}
+<div class="container">
+  <h3>Send message to Room {{ room }}</h3>
+  <div id="notification"></div>
+  <div class="row">
+    <form class="col s12" id="msg-form">
+      <div class="row">
+        <div class="input-field col s12">
+          <textarea id="textarea1" class="materialize-textarea"></textarea>
+          <label for="textarea1">Reply</label>
+        </div>
+      </div>
+      <button type="submit" class="waves-effect waves-light btn">
+        <i class="material-icons right">send</i>send
+      </button>
+    </form>
+  </div>
+</div>
+{% endblock %}
+<!--  -->
+{% block script %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
+<script>
+  const socket = io.connect("http://127.0.0.1:5000");
+  socket.on("connect", function () {
+    socket.emit("join_room", {
+      username: "{{ username }}",
+      room: "{{ room }}",
+    });
+    let msg = document.getElementById("textarea1");
+    document.getElementById("msg-form").onsubmit = function (e) {
+      e.preventDefault();
+      let message = msg.value.trim();
+      if (msg.value.length) {
+        socket.emit("send", {
+          username: "{{ username }}",
+          room: "{{ room }}",
+          message: message,
+        });
+      }
+      msg.value = "";
+      msg.focus();
+    };
+  });
+
+  socket.on("receive", function (data) {
+    console.log(data);
+    const node = document.createElement("div");
+    node.innerHTML = `<b>${data.username}</b>: ${data.message}`;
+    document.getElementById("notification").appendChild(node);
+  });
+
+  socket.on("broadcast", function (data) {
+    console.log(data);
+    const node = document.createElement("div");
+    node.innerHTML = `<em>${data.username}</em> is now online.`;
+    document.getElementById("notification").appendChild(node);
+  });
+</script>
+{% endblock %}

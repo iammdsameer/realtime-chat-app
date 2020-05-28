@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+<!--  -->
+{% block content %}
+<div class="container">
+  <form action="/room" method="POST">
+    <div class="row">
+      <div class="input-field col s5">
+        <input name="username" id="username" type="text" />
+        <label for="username">Username</label>
+      </div>
+      <div class="input-field col s5">
+        <input name="room" id="room" type="text" />
+        <label for="room">Room ID</label>
+      </div>
+    </div>
+    <button class="btn waves-effect waves-light btn">Get In!</button>
+  </form>
+</div>
+{% endblock %}
